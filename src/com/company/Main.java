@@ -16,15 +16,20 @@ public class Main {
         BufferedImage bufferedImage;
         ScreenConverter sc;
         World world;
-        private Timer timer;
-        private long t;
+        private Timer updateTimer;
+        private Timer repaintTimer;
+        private long tUpdate;
+        private long tRepaint;
         int w,h;
         DrawPanel(){
             sc = new ScreenConverter(0,10,10,10,getWidth(),getHeight());
             world = new World(new Field(new Vector2(10,10)),new Puck(1,1,new Vector2(5,5)));
-            timer = new Timer(40,this);
-            t = System.currentTimeMillis();
-            timer.start();
+            updateTimer = new Timer(40,this);
+            repaintTimer = new Timer(40,this);
+            tUpdate = System.currentTimeMillis();
+            tRepaint = System.currentTimeMillis();
+            repaintTimer.start();
+            updateTimer.start();
         }
         @Override
         public void paint(Graphics g) {//todo make 2 timers
@@ -39,10 +44,13 @@ public class Main {
 
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            long now = System.currentTimeMillis();
-            world.update((now - t)*0.001);
-            t = now;
-            repaint();
+            if(actionEvent.getSource()==repaintTimer) {
+                repaint();
+            } else {
+                long now = System.currentTimeMillis();
+                world.update((now - tUpdate) * 0.001);
+                tUpdate = now;
+            }
         }
     }
     public static void main(String[] args) {
